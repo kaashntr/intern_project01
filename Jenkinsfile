@@ -1,16 +1,21 @@
 pipeline {
     agent any
     stages {
-        stage('Build frontend') {
+        stage('Checkout CSM') {
             steps {
-                echo "Build completed"
                 checkout scm
             }
         }
-        stage('Test') {
+        stage('Build frontend') {
+            agent {
+                docker{
+                    image "node:14-alpine"
+                }     
+            }
             steps {
-                echo "Test completed"
-                sh "ls -la"
+                sh """
+                    node -v
+                """
             }
         }
         stage('Deploy') {
