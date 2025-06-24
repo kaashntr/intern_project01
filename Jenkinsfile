@@ -7,11 +7,7 @@ pipeline {
             }
         }
         stage('Build frontend') {
-            agent {
-                docker{
-                    image "node:14-alpine"
-                }     
-            }
+            agent {docker "node:14-alpine"}
             steps {
                 sh """
                     node -v
