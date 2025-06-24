@@ -8,7 +8,7 @@ pipeline {
         }
         stage('Build frontend') {
             agent {
-                docker {
+                dockerContainer {
                     image 'node:14-alpine' // Different agent for this stage
                 }
             }
