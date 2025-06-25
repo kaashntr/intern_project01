@@ -8,7 +8,7 @@ pipeline {
         }
         stage('Build frontend') {
             steps {
-                nodejs(nodeJSInstallationName: 'Node.js 14.x LTS') {
+                nodejs(nodeJSInstallationName: 'node14') {
                     sh 'node -v'
                     sh 'npm -v'
                     // sh 'npm install' // Install project dependencies
