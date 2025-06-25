@@ -1,17 +1,4 @@
-FROM gradle:6.9.4-jdk11 AS build-stage
-
-COPY ./backend /backend
-
-ARG DATABASE
-ARG USERNAME
-ARG USERPASSWORD
-
-RUN sed -i "s|hibernate.connection.url=.*|hibernate.connection.url=jdbc:postgresql://postgres:5432/${DATABASE}|" /backend/src/main/resources/hibernate.properties && \
-    sed -i "s|hibernate.connection.username=.*|hibernate.connection.username=${USERNAME}|" /backend/src/main/resources/hibernate.properties && \
-    sed -i "s|hibernate.connection.password=.*|hibernate.connection.password=${USERPASSWORD}|" /backend/src/main/resources/hibernate.properties && \
-    cd /backend && gradle build --no-daemon --console=plain
-
-FROM eclipse-temurin:11-jre-alpine AS deploy
+FROM eclipse-temurin:11-jre-alpine
 
 RUN apk add --no-cache curl && \
     mkdir -p /opt && \
@@ -21,7 +8,18 @@ RUN apk add --no-cache curl && \
     rm /tmp/tomcat.tar.gz && \
     rm -rf /opt/tomcat/webapps/* /tmp/tomcat.tar.gz
 
-COPY --from=build-stage /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
+COPY /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
+
+ARG DB_ENDPOINT
+ARG DATABASE
+ARG USERNAME
+ARG USERPASSWORD
+ARG CACHE_ENDPOINT
+
+RUN sed -i "s|hibernate.connection.url=.*|hibernate.connection.url=jdbc:postgresql://${DB_ENDPOINT}:5432/${DATABASE}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
+    sed -i "s|hibernate.connection.username=.*|hibernate.connection.username=${USERNAME}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
+    sed -i "s|hibernate.connection.password=.*|hibernate.connection.password=${USERPASSWORD}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
+    sed -i "s|redis.address = redis://REDIS_ENDPOINT:6379|redis.address = redis://${CACHE_ENDPOINT}:6379|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/cache.properties
 
 EXPOSE 8080
 
