@@ -8,9 +8,12 @@ pipeline {
         }
         stage('Build frontend') {
             steps {
-                sh """
-                    ls -la
-                """
+                nodejs(nodeJSInstallationName: 'Node.js 11.x LTS') {
+                    sh 'node -v'
+                    sh 'npm -v'
+                    // sh 'npm install' // Install project dependencies
+                    // sh 'npm run build' // Build your frontend application
+                }
             }
         }
         stage('Deploy') {
