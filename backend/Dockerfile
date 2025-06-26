@@ -10,11 +10,11 @@ RUN apk add --no-cache curl && \
 
 COPY /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
 
-ARG DB_ENDPOINT
-ARG DATABASE
-ARG USERNAME
-ARG USERPASSWORD
-ARG CACHE_ENDPOINT
+ARG DB_ENDPOINT=DB_ENDPOINT
+ARG DATABASE=DATABASE
+ARG USERNAME=USERNAME
+ARG USERPASSWORD=USERPASSWORD
+ARG CACHE_ENDPOINT=CACHE_ENDPOINT
 
 RUN mkdir /opt/tomcat/webapps/ROOT && \
     unzip /opt/tomcat/webapps/ROOT.war -d /opt/tomcat/webapps/ROOT && \
