@@ -1,9 +1,6 @@
 pipeline {
     agent any
-    tools {
-        jdk 'jdk11'
-        gradle 'gradle-6.8.3'
-    }
+    
     stages {
         stage('Checkout CSM') {
             steps {
@@ -11,10 +8,28 @@ pipeline {
             }
         }
         stage('Build backend'){
+            tools {
+                jdk 'jdk11'
+                gradle 'gradle-6.8.3'
+            }
             steps{
                 sh 'gradle --version'
                 dir("backend/backend"){
                     sh "gradle clean war"
+                }
+            }
+        }
+        stage('Build frontend'){
+            tools {
+                nodejs 'node14'
+            }
+            steps{
+                sh 'node --version'
+                dir("frontend/frontend"){
+                    sh """
+                        npm install
+                        npm run build
+                    """
                 }
             }
         }
