@@ -31,7 +31,7 @@ pipeline {
             steps{
                 sh 'gradle --version'
                 dir("backend/backend"){
-                    sh "gradle clean war"
+                    sh "sudo gradle clean war"
                 }
             }
         }
