@@ -10,11 +10,6 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Deploy') {
-            steps {
-                echo "Deploy completed"
-            }
-        } 
         stage('Build backend'){
             steps{
                 sh 'gradle --version'
