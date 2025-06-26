@@ -55,28 +55,30 @@ pipeline {
                 script { // 'script' block is needed to use withCredentials inside 'steps'
                     // Use withCredentials to securely expose the Docker Hub username and PAT
                     // as environment variables within this block.
-                    withCredentials([usernamePassword(credentialsId: env.DOCKER_HUB_CREDENTIALS_ID, passwordVariable: 'DOCKER_PAT', usernameVariable: 'DOCKER_USER')]) {
-                        // 1. Login to Docker Hub or your private registry
-                        // Using -u and -p as requested.
-                        // The ${DOCKER_REGISTRY_URL} is included for clarity,
-                        // but for Docker Hub, 'docker login -u ... -p ...' works fine without the URL.
-                        sh "docker login ${DOCKER_REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PAT}"
+                    dir("backend"){
+                        withCredentials([usernamePassword(credentialsId: env.DOCKER_HUB_CREDENTIALS_ID, passwordVariable: 'DOCKER_PAT', usernameVariable: 'DOCKER_USER')]) {
+                            // 1. Login to Docker Hub or your private registry
+                            // Using -u and -p as requested.
+                            // The ${DOCKER_REGISTRY_URL} is included for clarity,
+                            // but for Docker Hub, 'docker login -u ... -p ...' works fine without the URL.
+                            sh "docker login ${DOCKER_REGISTRY_URL} -u ${DOCKER_USER} -p ${DOCKER_PAT}"
 
-                        // 2. Build the Docker Image
-                        // The '.' means the build context is the current working directory (Jenkins workspace).
-                        // Docker will look for a Dockerfile in this directory.
-                        // We apply two tags: the dynamic version tag and 'latest'.
-                        sh "docker build -t ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION} -t ${FULL_IMAGE_NAME}:latest ."
+                            // 2. Build the Docker Image
+                            // The '.' means the build context is the current working directory (Jenkins workspace).
+                            // Docker will look for a Dockerfile in this directory.
+                            // We apply two tags: the dynamic version tag and 'latest'.
+                            sh "docker build -t ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION} -t ${FULL_IMAGE_NAME}:latest ."
 
-                        // 3. Push the Docker Image(s) to Docker Hub or your private registry
-                        echo "Pushing image ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION}..."
-                        sh "docker push ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION}"
+                            // 3. Push the Docker Image(s) to Docker Hub or your private registry
+                            echo "Pushing image ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION}..."
+                            sh "docker push ${FULL_IMAGE_NAME}:${IMAGE_TAG_VERSION}"
 
-                        echo "Pushing image ${FULL_IMAGE_NAME}:latest..."
-                        sh "docker push ${FULL_IMAGE_NAME}:latest"
+                            echo "Pushing image ${FULL_IMAGE_NAME}:latest..."
+                            sh "docker push ${FULL_IMAGE_NAME}:latest"
 
-                        // 4. Logout from Docker Hub or your private registry (good practice for security)
-                        sh "docker logout ${DOCKER_REGISTRY_URL}"
+                            // 4. Logout from Docker Hub or your private registry (good practice for security)
+                            sh "docker logout ${DOCKER_REGISTRY_URL}"
+                        }
                     }
                 }
             }
