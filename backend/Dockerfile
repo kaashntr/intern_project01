@@ -1,3 +1,7 @@
+FROM eclipse-temurin:11-jdk-alpine AS build_stage 
+WORKDIR /app
+COPY /backend/build/libs/*.war /app/ROOT.war 
+
 FROM eclipse-temurin:11-jre-alpine
 
 RUN apk add --no-cache curl && \
@@ -8,13 +12,13 @@ RUN apk add --no-cache curl && \
     rm /tmp/tomcat.tar.gz && \
     rm -rf /opt/tomcat/webapps/* /tmp/tomcat.tar.gz
 
-COPY /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
-
 ARG DB_ENDPOINT
 ARG DATABASE
 ARG USERNAME
 ARG USERPASSWORD
 ARG CACHE_ENDPOINT
+
+COPY --from=build_stage /app/ROOT.war /opt/tomcat/webapps/ROOT.war
 
 RUN mkdir /opt/tomcat/webapps/ROOT && \
     unzip /opt/tomcat/webapps/ROOT.war -d /opt/tomcat/webapps/ROOT && \
