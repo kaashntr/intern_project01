@@ -8,7 +8,7 @@ RUN apk add --no-cache curl && \
     rm /tmp/tomcat.tar.gz && \
     rm -rf /opt/tomcat/webapps/* /tmp/tomcat.tar.gz
 
-COPY /backend/backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
+COPY /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
 
 ARG DB_ENDPOINT
 ARG DATABASE
