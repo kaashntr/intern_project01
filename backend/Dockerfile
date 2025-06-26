@@ -9,21 +9,14 @@ RUN apk add --no-cache curl && \
     rm -rf /opt/tomcat/webapps/* /tmp/tomcat.tar.gz
 
 COPY /backend/build/libs/*.war /opt/tomcat/webapps/ROOT.war
-
-ARG DB_ENDPOINT=DB_ENDPOINT
-ARG DATABASE=DATABASE
-ARG USERNAME=USERNAME
-ARG USERPASSWORD=USERPASSWORD
-ARG CACHE_ENDPOINT=CACHE_ENDPOINT
+COPY /scripts/entrypoint.sh /opt/entrypoint.sh
 
 RUN mkdir /opt/tomcat/webapps/ROOT && \
     unzip /opt/tomcat/webapps/ROOT.war -d /opt/tomcat/webapps/ROOT && \
     rm /opt/tomcat/webapps/ROOT.war && \
-    sed -i "s|hibernate.connection.url=.*|hibernate.connection.url=jdbc:postgresql://${DB_ENDPOINT}:5432/${DATABASE}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
-    sed -i "s|hibernate.connection.username=.*|hibernate.connection.username=${USERNAME}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
-    sed -i "s|hibernate.connection.password=.*|hibernate.connection.password=${USERPASSWORD}|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/hibernate.properties && \
-    sed -i "s|redis.address = redis://REDIS_ENDPOINT:6379|redis.address = redis://${CACHE_ENDPOINT}:6379|" /opt/tomcat/webapps/ROOT/WEB-INF/classes/cache.properties
+    chmod +x /opt/entrypoint.sh
 
 EXPOSE 8080
 
+ENTRYPOINT [ "/opt/entrypoint.sh" ]
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]
