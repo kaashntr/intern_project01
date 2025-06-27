@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 FILE="/usr/share/nginx/html/static/js/main.29a6a448.js"
 
