@@ -20,6 +20,9 @@ pipeline {
             }
         }
         stage('Build frontend'){
+            environment{
+                REACT_APP_API_BASE_URL="BACKEND_URL"
+            }
             tools {
                 nodejs 'node14'
             }
