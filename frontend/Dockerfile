@@ -5,7 +5,7 @@ RUN rm -rf /usr/share/nginx/html
 WORKDIR /usr/share/nginx/html
 
 COPY /scripts/entrypoint.sh /opt/entrypoint.sh
-COPY /frontend/build.zip .
+COPY /frontend/build.zip /usr/share/nginx/html/build.zip
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN chmod +x /opt/entrypoint.sh && \
