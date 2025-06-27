@@ -9,7 +9,7 @@ COPY /frontend/build.zip .
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN chmod +x /opt/entrypoint.sh && \
-    unzip build.zip -d ./build && \
+    unzip build.zip . && \
     rm build.zip
 
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
