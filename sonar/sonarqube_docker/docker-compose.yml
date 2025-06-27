@@ -1,48 +1,111 @@
-version: '3'
+# version: '3'
+
+# services:
+#   postgres:
+#     image: postgres:13
+#     container_name: sonarqube-postgres
+#     environment:
+#       POSTGRES_USER: sonar
+#       POSTGRES_PASSWORD: sonar
+#       POSTGRES_DB: sonar
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#     networks:
+#       - sonarnet
+#     restart: unless-stopped
+
+#   sonarqube:
+#     image: sonarqube:community
+#     container_name: sonarqube
+#     depends_on:
+#       - postgres
+#     ports:
+#       - "9000:9000"
+#     environment:
+#       SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonar
+#       SONAR_JDBC_USERNAME: sonar
+#       SONAR_JDBC_PASSWORD: sonar
+#     volumes:
+#       - sonarqube-data:/opt/sonarqube/data
+#       - sonarqube-extensions:/opt/sonarqube/extensions
+#       - sonarqube-logs:/opt/sonarqube/logs
+#     networks:
+#       - sonarnet
+#     restart: unless-stopped
+#     ulimits:
+#       nofile:
+#         soft: 65536
+#         hard: 65536
+
+# networks:
+#   sonarnet:
+#     driver: bridge
+
+# volumes:
+#   postgres-data:
+#   sonarqube-data:
+#   sonarqube-extensions:
+#   sonarqube-logs:
+version: "3.9" # Recommended Docker Compose file format version
 
 services:
-  postgres:
-    image: postgres:13
-    container_name: sonarqube-postgres
-    environment:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
-      POSTGRES_DB: sonar
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - sonarnet
-    restart: unless-stopped
-
   sonarqube:
-    image: sonarqube:community
+    # Use a specific 9.x LTS version tag
+    # 9.9-community is the latest 9.x LTS Community Edition
+    image: sonarqube:9.9-community
     container_name: sonarqube
+    # Link to the PostgreSQL database service
     depends_on:
       - postgres
     ports:
-      - "9000:9000"
+      - "9000:9000" # SonarQube web UI
+      - "9001:9001" # SonarQube internal TCP port (can be removed if not needed)
     environment:
+      # Database configuration for SonarQube to connect to PostgreSQL
       SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonar
       SONAR_JDBC_USERNAME: sonar
       SONAR_JDBC_PASSWORD: sonar
+      # Optional: Set the JVM memory for SonarQube (adjust based on your server's RAM)
+      # SONAR_WEB_JVM_OPTS: -Xmx512m -Xms256m
+      # SONAR_CE_JVM_OPTS: -Xmx512m -Xms256m # Compute Engine
     volumes:
-      - sonarqube-data:/opt/sonarqube/data
-      - sonarqube-extensions:/opt/sonarqube/extensions
-      - sonarqube-logs:/opt/sonarqube/logs
+      # Persistent volumes to store SonarQube data, configurations, and logs
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions # For plugins
+      - sonarqube_logs:/opt/sonarqube/logs
     networks:
-      - sonarnet
+      - sonarnet # Custom network for inter-container communication
+    # Ensure SonarQube restarts if it stops unexpectedly
     restart: unless-stopped
+    # Required for Elasticsearch within SonarQube
     ulimits:
       nofile:
         soft: 65536
         hard: 65536
 
+  postgres:
+    image: postgres:13 # Using PostgreSQL 13, compatible with SonarQube 9.9
+    container_name: postgres_sonarqube
+    environment:
+      # PostgreSQL database credentials for SonarQube
+      POSTGRES_DB: sonar
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      # Persistent volume for PostgreSQL data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sonarnet
+    restart: unless-stopped
+
 networks:
+  # Define a custom bridge network for internal communication
   sonarnet:
     driver: bridge
 
 volumes:
-  postgres-data:
-  sonarqube-data:
-  sonarqube-extensions:
-  sonarqube-logs:
+  # Define named volumes for persistent data storage
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgres_data:
