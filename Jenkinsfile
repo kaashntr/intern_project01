@@ -47,17 +47,18 @@ pipeline {
                 SONARQUBE_CREDENTIALS_ID = "sonar-qube-credentials"
                 SONARQUBE_HOST_URL = "http://localhost:9000"
             }
-            script{
-                dir("backend/backend"){
-                    withCredentials([usernamePassword(credentialsId: env.SONARQUBE_CREDENTIALS_ID, passwordVariable: 'PROJECT_SECRET', usernameVariable: 'PROJECT_KEY')]){
-                        sh 'gradle --version'
-                        sh """
-                        gradle wrapper
-                        ./gradlew sonar   -Dsonar.projectKey=${PROJECT_KEY}   -Dsonar.host.url=${SONARQUBE_HOST_URL}   -Dsonar.login=${PROJECT_SECRET}                    
-                        """
+            steps{    
+                script{
+                    dir("backend/backend"){
+                        withCredentials([usernamePassword(credentialsId: env.SONARQUBE_CREDENTIALS_ID, passwordVariable: 'PROJECT_SECRET', usernameVariable: 'PROJECT_KEY')]){
+                            sh 'gradle --version'
+                            sh """
+                            gradle wrapper
+                            ./gradlew sonar   -Dsonar.projectKey=${PROJECT_KEY}   -Dsonar.host.url=${SONARQUBE_HOST_URL}   -Dsonar.login=${PROJECT_SECRET}                    
+                            """
+                        }
                     }
                 }
-                
             }
         }
         stage('Build Docker backend Image') {
