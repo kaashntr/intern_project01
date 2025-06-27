@@ -39,7 +39,7 @@ pipeline {
         }
         stage('Run SonarQube backend tests'){
             tools {
-                jdk 'jdk17'
+                jdk 'jdk11'
                 gradle 'gradle-6.8.3'
             }
             steps{
