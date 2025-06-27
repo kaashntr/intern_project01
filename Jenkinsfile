@@ -72,7 +72,7 @@ pipeline {
                 dir("backend/backend"){
                     sh """
                         gradle wrapper
-                        sudo ./gradlew sonar   -Dsonar.projectKey=class-schedule   -Dsonar.projectName='class-schedule'   -Dsonar.host.url=http://localhost:9000   -Dsonar.token=sqp_1116e0bde5ea46b5c7a78f1d5e09c8e96ef37dd7
+                        ./gradlew sonar   -Dsonar.projectKey=class-schedule   -Dsonar.projectName='class-schedule'   -Dsonar.host.url=http://localhost:9000   -Dsonar.token=sqp_1116e0bde5ea46b5c7a78f1d5e09c8e96ef37dd7
                     """
                 }
             }
