@@ -32,6 +32,7 @@ pipeline {
                     sh """
                         npm install
                         npm run build
+                        npm test
                         cd build && zip -r -q ../build.zip .
                     """
                 }
@@ -42,13 +43,21 @@ pipeline {
                 jdk 'jdk11'
                 gradle 'gradle-6.8.3'
             }
-            steps{
-                sh 'gradle --version'
+            environment{
+                SONARQUBE_CREDENTIALS_ID = "sonar-qube-credentials"
+                SONARQUBE_HOST_URL = "http://localhost:9000"
+            }
+            script{
                 dir("backend/backend"){
-                    sh """
+                    withCredentials([usernamePassword(credentialsId: env.SONARQUBE_CREDENTIALS_ID, passwordVariable: 'PROJECT_SECRET', usernameVariable: 'PROJECT_KEY')]){
+                        sh 'gradle --version'
+                        sh """
                         gradle wrapper
-                        ./gradlew sonar   -Dsonar.projectKey=class-schedule   -Dsonar.host.url=http://localhost:9000   -Dsonar.login=sqp_a22b1ff2a607a6cb961eb49d4700a5d57ad1da16                    """
+                        ./gradlew sonar   -Dsonar.projectKey=${PROJECT_KEY}   -Dsonar.host.url=${SONARQUBE_HOST_URL}   -Dsonar.login=${PROJECT_SECRET}                    
+                        """
+                    }
                 }
+                
             }
         }
         stage('Build Docker backend Image') {
