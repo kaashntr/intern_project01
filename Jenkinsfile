@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Build backend'){
             tools {
-                jdk 'jdk11'
+                jdk 'jdk17'
                 gradle 'gradle-6.8.3'
             }
             steps{
@@ -37,6 +37,21 @@ pipeline {
                 }
             }
         }
+        stage('Run SonarQube backend tests'){
+            tools {
+                jdk 'jdk11'
+                gradle 'gradle-6.8.3'
+            }
+            steps{
+                sh 'gradle --version'
+                dir("backend/backend"){
+                    sh """
+                        gradle wrapper
+                        ./gradlew sonar   -Dsonar.projectKey=class-schedule   -Dsonar.projectName='class-schedule'   -Dsonar.host.url=http://localhost:9000   -Dsonar.token=sqp_1116e0bde5ea46b5c7a78f1d5e09c8e96ef37dd7
+                    """
+                }
+            }
+        }
         stage('Build Docker backend Image') {
             environment {
                 DOCKER_HUB_CREDENTIALS_ID = 'docker-hub-pat-credentials'
@@ -60,21 +75,6 @@ pipeline {
                             sh "docker logout ${DOCKER_REGISTRY_URL}"
                         }
                     }
-                }
-            }
-        }
-        stage('Run SonarQube backend tests'){
-            tools {
-                jdk 'jdk11'
-                gradle 'gradle-6.8.3'
-            }
-            steps{
-                sh 'gradle --version'
-                dir("backend/backend"){
-                    sh """
-                        gradle wrapper
-                        ./gradlew sonar   -Dsonar.projectKey=class-schedule   -Dsonar.projectName='class-schedule'   -Dsonar.host.url=http://localhost:9000   -Dsonar.token=sqp_1116e0bde5ea46b5c7a78f1d5e09c8e96ef37dd7
-                    """
                 }
             }
         }
