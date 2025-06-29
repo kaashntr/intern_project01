@@ -38,29 +38,29 @@ pipeline {
                 }
             }
         }
-        // stage('Run SonarQube backend tests'){
-        //     tools {
-        //         jdk 'jdk11'
-        //         gradle 'gradle-6.8.3'
-        //     }
-        //     environment{
-        //         SONARQUBE_CREDENTIALS_ID = "sonar-qube-credentials"
-        //         SONARQUBE_HOST_URL = "http://localhost:9000"
-        //     }
-        //     steps{    
-        //         script{
-        //             dir("backend/backend"){
-        //                 withCredentials([usernamePassword(credentialsId: env.SONARQUBE_CREDENTIALS_ID, passwordVariable: 'PROJECT_SECRET', usernameVariable: 'PROJECT_KEY')]){
-        //                     sh 'gradle --version'
-        //                     sh """
-        //                     gradle wrapper
-        //                     ./gradlew sonar   -Dsonar.projectKey=${PROJECT_KEY}   -Dsonar.host.url=${SONARQUBE_HOST_URL}   -Dsonar.login=${PROJECT_SECRET}                    
-        //                     """
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Run SonarQube backend tests'){
+            tools {
+                jdk 'jdk11'
+                gradle 'gradle-6.8.3'
+            }
+            environment{
+                SONARQUBE_CREDENTIALS_ID = "sonar-qube-credentials"
+                SONARQUBE_HOST_URL = "http://localhost:9000"
+            }
+            steps{    
+                script{
+                    dir("backend/backend"){
+                        withCredentials([usernamePassword(credentialsId: env.SONARQUBE_CREDENTIALS_ID, passwordVariable: 'PROJECT_SECRET', usernameVariable: 'PROJECT_KEY')]){
+                            sh 'gradle --version'
+                            sh """
+                            gradle wrapper
+                            ./gradlew sonar   -Dsonar.projectKey=${PROJECT_KEY}   -Dsonar.host.url=${SONARQUBE_HOST_URL}   -Dsonar.login=${PROJECT_SECRET}                    
+                            """
+                        }
+                    }
+                }
+            }
+        }
         stage('Build Docker backend Image') {
             environment {
                 DOCKER_HUB_CREDENTIALS_ID = 'docker-hub-pat-credentials'
